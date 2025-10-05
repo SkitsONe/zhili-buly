@@ -38,7 +38,7 @@ class PostService
     public function createPost(array $data, User $user): Post
     {
         $category = $this->resolveCategory($data);
-        
+
         return $this->postRepository->createPost($data, $user, $category);
 
     }

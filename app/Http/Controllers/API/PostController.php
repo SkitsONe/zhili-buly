@@ -10,6 +10,7 @@ use App\Services\PostService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PostController extends Controller
 {
@@ -34,11 +35,8 @@ class PostController extends Controller
             ]);
 
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка при получении статей',
-                'error' => $e->getMessage()
-            ], 500);
+            Log::error($e->getMessage());
+            abort(500, 'Ошибка при получении статей');
         }
     }
 
@@ -54,11 +52,8 @@ class PostController extends Controller
             ], 201);
 
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка при создании статьи',
-                'error' => $e->getMessage()
-            ], 500);
+            Log::error($e->getMessage());
+            abort(500, 'Ошибка при создании статьи');
         }
     }
 
@@ -68,10 +63,7 @@ class PostController extends Controller
             $post = $this->postService->findByIdWithRelations($id);
 
             if (!$post) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Статья не найдена'
-                ], 404);
+                abort(404, 'Статья не найдена');
             }
 
             return response()->json([
@@ -80,11 +72,8 @@ class PostController extends Controller
             ]);
 
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка при получении статьи',
-                'error' => $e->getMessage()
-            ], 500);
+            Log::error($e->getMessage());
+            abort(500, 'Ошибка при получении статьи');
         }
     }
 
@@ -92,19 +81,13 @@ class PostController extends Controller
     {
         try {
             if (!$this->postService->checkOwnership($id, $request->user()->id)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'У вас нет прав для редактирования этой статьи'
-                ], 403);
+                abort(403, 'У вас нет прав для редактирования этой статьи');
             }
 
             $updatedPost = $this->postService->updatePost($id, $request->validated());
 
             if (!$updatedPost) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Статья не найдена'
-                ], 404);
+                abort(404, 'Статья не найдена');
             }
 
             return response()->json([
@@ -114,11 +97,8 @@ class PostController extends Controller
             ]);
 
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка при обновлении статьи',
-                'error' => $e->getMessage()
-            ], 500);
+            Log::error($e->getMessage());
+            abort(500, 'Ошибка при обновлении статьи');
         }
     }
 
@@ -128,26 +108,17 @@ class PostController extends Controller
             $post = $this->postService->findById($id);
 
             if (!$post) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Статья не найдена'
-                ], 404);
+                abort(404, 'Статья не найдена');
             }
 
             if (!$this->postService->checkOwnership($id, request()->user()->id)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'У вас нет прав для удаления этой статьи'
-                ], 403);
+                abort(403, 'У вас нет прав для удаления этой статьи');
             }
 
             $result = $this->postService->deletePost($id);
 
             if (!$result) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Статья не найдена'
-                ], 404);
+                abort(404, 'Статья не найдена');
             }
 
             return response()->json([
@@ -156,11 +127,8 @@ class PostController extends Controller
             ], 200);
 
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка при удалении статьи',
-                'error' => $e->getMessage()
-            ], 500);
+            Log::error($e->getMessage());
+            abort(500, 'Ошибка при удалении статьи');
         }
     }
 }

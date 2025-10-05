@@ -9,6 +9,7 @@ use App\Http\Resources\CategoryResource;
 use App\Services\CategoryService;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
@@ -27,11 +28,8 @@ class CategoryController extends Controller
             ]);
 
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка при получении категорий',
-                'error' => $e->getMessage()
-            ], 500);
+            Log::error($e->getMessage());
+            abort(500, 'Ошибка при получении категорий.');
         }
     }
 
@@ -47,11 +45,8 @@ class CategoryController extends Controller
             ], 201);
 
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка при создании категории',
-                'error' => $e->getMessage()
-            ], 500);
+            Log::error($e->getMessage());
+            abort(500, 'Ошибка при создании категории.');
         }
     }
 
@@ -61,11 +56,7 @@ class CategoryController extends Controller
             $category = $this->categoryService->findByIdWithPosts($id);
 
             if (!$category) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Категория не найдена',
-                    'available_categories' => $this->categoryService->getAvailableCategories()
-                ], 404);
+                abort(404, 'Категория не найдена');
             }
 
             return response()->json([
@@ -74,11 +65,8 @@ class CategoryController extends Controller
             ]);
 
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка при получении категории',
-                'error' => $e->getMessage()
-            ], 500);
+            Log::error($e->getMessage());
+            abort(500, 'Ошибка при получении категории');
         }
     }
 
@@ -88,10 +76,7 @@ class CategoryController extends Controller
             $category = $this->categoryService->updateCategory($id, $request->validated());
 
             if (!$category) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Категория не найдена'
-                ], 404);
+                abort(404, 'Категория не найдена');
             }
 
             return response()->json([
@@ -101,11 +86,8 @@ class CategoryController extends Controller
             ]);
 
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка при обновлении категории',
-                'error' => $e->getMessage()
-            ], 500);
+            Log::error($e->getMessage());
+            abort(500, 'Ошибка при обновлении категории');
         }
     }
 
@@ -115,10 +97,7 @@ class CategoryController extends Controller
             $result = $this->categoryService->deleteCategory($id);
 
             if (!$result) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Категория не найдена'
-                ], 404);
+                abort(404, 'Категория не найдена');
             }
 
             return response()->json([
@@ -127,11 +106,8 @@ class CategoryController extends Controller
             ], 200);
 
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка при удалении категории',
-                'error' => $e->getMessage()
-            ], 500);
+            Log::error($e->getMessage());
+            abort(500, 'Ошибка при удалении категории');
         }
     }
 
@@ -146,11 +122,8 @@ class CategoryController extends Controller
             ]);
 
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка при получении категорий',
-                'error' => $e->getMessage()
-            ], 500);
+            Log::error($e->getMessage());
+            abort(500, 'Ошибка при получении категорий');
         }
     }
 }

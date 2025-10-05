@@ -3,59 +3,74 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Services\AuthService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        private AuthService $authService
+    ) {}
+
     public function login(Request $request): JsonResponse
     {
         try {
-            $request->validate([
+            $credentials = $request->validate([
                 'email' => 'required|email',
                 'password' => 'required',
             ]);
 
-            $user = User::where('email', $request->email)->first();
-
-            if (!$user || !Hash::check($request->password, $user->password)) {
-                throw ValidationException::withMessages([
-                    'email' => ['Неверные учетные данные.'],
-                ]);
-            }
-
-            $token = $user->createToken('auth_token')->plainTextToken;
+            $authData = $this->authService->login($credentials);
 
             return response()->json([
                 'success' => true,
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'user' => $user,
+                'access_token' => $authData['access_token'],
+                'token_type' => $authData['token_type'],
+                'user' => $authData['user'],
             ]);
 
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка авторизации',
-                'errors' => $e->errors()
-            ], 401);
+            Log::error($e->getMessage());
+            abort(401, 'Ошибка авторизации');
+
         } catch (Exception $e) {
+            Log::error($e->getMessage());
+            abort(500, 'Ошибка при входе в систему');
+        }
+    }
+
+    public function register(Request $request): JsonResponse
+    {
+        try {
+            $data = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+
+            $authData = $this->authService->register($data);
+
             return response()->json([
-                'success' => false,
-                'message' => 'Ошибка при входе в систему',
-                'error' => $e->getMessage()
-            ], 500);
+                'success' => true,
+                'access_token' => $authData['access_token'],
+                'token_type' => $authData['token_type'],
+                'user' => $authData['user'],
+            ], 201);
+
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            abort(500, 'Ошибка при регистрации');
         }
     }
 
     public function logout(Request $request): JsonResponse
     {
         try {
-            $request->user()->currentAccessToken()->delete();
+            $this->authService->logout($request->user());
 
             return response()->json([
                 'success' => true,
@@ -63,28 +78,24 @@ class AuthController extends Controller
             ]);
 
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка при выходе из системы',
-                'error' => $e->getMessage()
-            ], 500);
+            Log::error($e->getMessage());
+            abort(500, 'Ошибка при выходе из системы');
         }
     }
 
     public function me(Request $request): JsonResponse
     {
         try {
+            $user = $this->authService->getCurrentUser($request->user());
+
             return response()->json([
                 'success' => true,
-                'user' => $request->user()
+                'user' => $user
             ]);
 
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка при получении данных пользователя',
-                'error' => $e->getMessage()
-            ], 500);
+            Log::error($e->getMessage());
+            abort(500, 'Ошибка при получении данных пользователя');
         }
     }
 }
