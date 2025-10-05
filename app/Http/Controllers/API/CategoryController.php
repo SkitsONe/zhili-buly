@@ -7,6 +7,7 @@ use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Services\CategoryService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 
 class CategoryController extends Controller
@@ -25,7 +26,7 @@ class CategoryController extends Controller
                 'data' => CategoryResource::collection($categories)
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка при получении категорий',
@@ -45,7 +46,7 @@ class CategoryController extends Controller
                 'data' => new CategoryResource($category)
             ], 201);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка при создании категории',
@@ -54,7 +55,7 @@ class CategoryController extends Controller
         }
     }
 
-    public function show($id): JsonResponse
+    public function show(int $id): JsonResponse
     {
         try {
             $category = $this->categoryService->findByIdWithPosts($id);
@@ -72,7 +73,7 @@ class CategoryController extends Controller
                 'data' => new CategoryResource($category)
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка при получении категории',
@@ -99,7 +100,7 @@ class CategoryController extends Controller
                 'data' => new CategoryResource($category)
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка при обновлении категории',
@@ -108,7 +109,7 @@ class CategoryController extends Controller
         }
     }
 
-    public function destroy($id): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
         try {
             $result = $this->categoryService->deleteCategory($id);
@@ -125,7 +126,7 @@ class CategoryController extends Controller
                 'message' => 'Категория успешно удалена!'
             ], 200);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка при удалении категории',
@@ -144,7 +145,7 @@ class CategoryController extends Controller
                 'data' => CategoryResource::collection($categories)
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка при получении категорий',

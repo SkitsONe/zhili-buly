@@ -7,6 +7,7 @@ use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Services\PostService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -32,7 +33,7 @@ class PostController extends Controller
                 ]
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка при получении статей',
@@ -52,7 +53,7 @@ class PostController extends Controller
                 'data' => new PostResource($post->load(['user', 'category']))
             ], 201);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка при создании статьи',
@@ -61,7 +62,7 @@ class PostController extends Controller
         }
     }
 
-    public function show($id): JsonResponse
+    public function show(int $id): JsonResponse
     {
         try {
             $post = $this->postService->findByIdWithRelations($id);
@@ -78,7 +79,7 @@ class PostController extends Controller
                 'data' => new PostResource($post)
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка при получении статьи',
@@ -112,7 +113,7 @@ class PostController extends Controller
                 'data' => new PostResource($updatedPost->load(['user', 'category']))
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка при обновлении статьи',
@@ -121,7 +122,7 @@ class PostController extends Controller
         }
     }
 
-    public function destroy($id): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
         try {
             $post = $this->postService->findById($id);
@@ -132,7 +133,7 @@ class PostController extends Controller
                     'message' => 'Статья не найдена'
                 ], 404);
             }
-            // Проверка прав через сервис
+
             if (!$this->postService->checkOwnership($id, request()->user()->id)) {
                 return response()->json([
                     'success' => false,
@@ -154,7 +155,7 @@ class PostController extends Controller
                 'message' => 'Статья успешно удалена!'
             ], 200);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка при удалении статьи',

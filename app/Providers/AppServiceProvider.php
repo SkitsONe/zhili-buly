@@ -16,7 +16,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CategoryRepository::class);
 
         $this->app->bind(PostService::class, function ($app) {
-            return new PostService($app->make(PostRepository::class));
+            return new PostService(
+                $app->make(PostRepository::class),
+                $app->make(CategoryRepository::class)
+            );
         });
 
         $this->app->bind(CategoryService::class);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
@@ -42,7 +43,7 @@ class AuthController extends Controller
                 'message' => 'Ошибка авторизации',
                 'errors' => $e->errors()
             ], 401);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка при входе в систему',
@@ -61,7 +62,7 @@ class AuthController extends Controller
                 'message' => 'Успешный выход из системы'
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка при выходе из системы',
@@ -78,7 +79,7 @@ class AuthController extends Controller
                 'user' => $request->user()
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка при получении данных пользователя',

@@ -33,7 +33,6 @@ class StorePostRequest extends FormRequest
 
     public function prepareForValidation()
     {
-        // Если передано category_name, но нет category_id - создаем категорию
         if ($this->has('category_name') && !$this->has('category_id')) {
             $this->merge([
                 'category_name' => trim($this->category_name)
