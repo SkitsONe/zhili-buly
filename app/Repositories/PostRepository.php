@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\Category;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -44,15 +45,15 @@ class PostRepository
             ->get();
     }
 
-    public function createPost(array $data, User $user): Post
+    public function createPost(array $data, User $user, Category $category): Post
     {
         return Post::create([
             'title' => $data['title'],
             'slug' => $this->generateSlug($data['title']),
             'content' => $data['content'],
             'excerpt' => $data['excerpt'] ?? null,
-            'category_id' => $data['category_id'],
-            'user_id' => $user['user_id'],
+            'category_id' => $category->id,
+            'user_id' => $user->id,
             'published' => $data['published'] ?? false,
             'published_at' => ($data['published'] ?? false) ? now() : null,
         ]);
