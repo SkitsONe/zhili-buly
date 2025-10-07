@@ -72,8 +72,8 @@ class CategoryRepository
             return Category::firstOrCreate(
                 ['id' => $data['category_id']],
                 [
-                    'name' => 'Категория ' . $data['category_id'],
-                    'slug' => 'category-' . $data['category_id']
+                    'name' => $data['category_name'] ?? 'Категория ' . $data['category_id'],
+                    'slug' => Str::slug($data['category_name'] ?? 'category-' . $data['category_id'])
                 ]
             );
         }

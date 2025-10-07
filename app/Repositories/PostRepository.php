@@ -40,7 +40,7 @@ class PostRepository
     public function getUserPosts(int $userId)
     {
         return Post::where('user_id', $userId)
-            ->with(['category'])
+            ->with(['category', 'user'])
             ->latest()
             ->get();
     }
