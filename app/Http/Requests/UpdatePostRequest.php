@@ -16,7 +16,7 @@ class UpdatePostRequest extends FormRequest
         return [
             'title' => 'sometimes|required|string|max:255',
             'content' => 'sometimes|required|string',
-            'excerpt' => 'nullable|string|max:500',
+            'short_description' => 'nullable|string|max:500',
             'category_id' => 'nullable|integer', // делаем необязательным
             'category_name' => 'nullable|string|max:255', // добавляем поле для имени категории
             'published' => 'boolean',

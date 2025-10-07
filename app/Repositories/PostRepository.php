@@ -49,9 +49,8 @@ class PostRepository
     {
         return Post::create([
             'title' => $data['title'],
-            'slug' => $this->generateSlug($data['title']),
             'content' => $data['content'],
-            'excerpt' => $data['excerpt'] ?? null,
+            'short_description' => $data['short_description'] ?? null,
             'category_id' => $category->id,
             'user_id' => $user->id,
             'published' => $data['published'] ?? false,
@@ -61,13 +60,8 @@ class PostRepository
 
     public function updatePost($id, array $data): ?Post
     {
-        $post = $this->findById($id);
+        $post = $this->findById($id)->update($data);
 
-        if (isset($data['title']) && $post->title !== $data['title']) {
-            $data['slug'] = $this->generateSlug($data['title']);
-        }
-
-        $post->update($data);
         return $post->fresh();
     }
 
@@ -88,8 +82,4 @@ class PostRepository
         return $post && $post->user_id === $userId;
     }
 
-    private function generateSlug(string $title): string
-    {
-        return Str::slug($title) . '-' . uniqid();
-    }
 }

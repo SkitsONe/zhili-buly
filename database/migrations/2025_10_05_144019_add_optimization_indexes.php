@@ -18,7 +18,7 @@ return new class extends Migration
         });
 
         Schema::table('categories', function (Blueprint $table) {
-            $table->index('slug'); // Ускоряет JOIN по slug
+            $table->index('slug');
         });
 
         Schema::table('users', function (Blueprint $table) {

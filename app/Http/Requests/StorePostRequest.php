@@ -16,7 +16,7 @@ class StorePostRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'excerpt' => 'nullable|string|max:500',
+            'short_description' => 'nullable|string|max:500',
             'category_id' => 'nullable|integer',
             'category_name' => 'nullable|string|max:255',
             'published' => 'boolean',

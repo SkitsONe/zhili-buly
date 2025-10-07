@@ -36,7 +36,7 @@ class PostController extends Controller
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(500, 'Ошибка при получении статей');
+            abort(400, 'Ошибка при получении статей');
         }
     }
 
@@ -53,7 +53,7 @@ class PostController extends Controller
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(500, 'Ошибка при создании статьи');
+            abort(400, 'Ошибка при создании статьи');
         }
     }
 
@@ -73,7 +73,7 @@ class PostController extends Controller
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(500, 'Ошибка при получении статьи');
+            abort(400, 'Ошибка при получении статьи');
         }
     }
 
@@ -98,7 +98,7 @@ class PostController extends Controller
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(500, 'Ошибка при обновлении статьи');
+            abort(400, 'Ошибка при обновлении статьи');
         }
     }
 
@@ -128,7 +128,7 @@ class PostController extends Controller
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(500, 'Ошибка при удалении статьи');
+            abort(400, 'Ошибка при удалении статьи');
         }
     }
 }

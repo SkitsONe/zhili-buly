@@ -33,9 +33,8 @@ class DatabaseSeeder extends Seeder
         // Создаем статьи
         Post::create([
             'title' => 'Первый блог',
-            'slug' => 'first-blog-post',
             'content' => 'Это первый тестовый блог',
-            'excerpt' => 'Краткое описание',
+            'short_description' => 'Краткое описание',
             'user_id' => $user1->id,
             'category_id' => $category1->id,
             'published' => true,
@@ -46,7 +45,7 @@ class DatabaseSeeder extends Seeder
             'title' => 'Невероятное путешествие',
             'slug' => 'amazing-travel-experience',
             'content' => 'Рассказ о первом путешествии...',
-            'excerpt' => 'история путешествия',
+            'short_description' => 'история путешествия',
             'user_id' => $user2->id,
             'category_id' => $category2->id,
             'published' => true,

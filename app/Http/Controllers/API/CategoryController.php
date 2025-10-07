@@ -87,7 +87,7 @@ class CategoryController extends Controller
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(500, 'Ошибка при обновлении категории');
+            abort(400, 'Ошибка при обновлении категории');
         }
     }
 
