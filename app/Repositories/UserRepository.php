@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class UserRepository
 {
@@ -35,10 +34,5 @@ class UserRepository
     public function deleteCurrentToken($user): bool
     {
         return $user->currentAccessToken()->delete();
-    }
-
-    public function findById(int $id): ?User
-    {
-        return User::find($id);
     }
 }

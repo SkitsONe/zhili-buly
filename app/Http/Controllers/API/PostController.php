@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
+use App\Models\Post;
+use App\Policies\PostPolicy;
 use App\Services\PostService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -15,7 +17,8 @@ use Illuminate\Support\Facades\Log;
 class PostController extends Controller
 {
     public function __construct(
-        private PostService $postService
+        private PostService $postService,
+        private PostPolicy $postPolicy,
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -36,7 +39,7 @@ class PostController extends Controller
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(400, 'Ошибка при получении статей');
+            abort(400, 'Error when receiving the post');
         }
     }
 
@@ -46,89 +49,67 @@ class PostController extends Controller
             $post = $this->postService->createPost($request->validated(), $request->user());
 
             return response()->json([
-                'success' => true,
-                'message' => 'Статья успешно создана!',
                 'data' => new PostResource($post->load(['user', 'category']))
             ], 201);
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(400, 'Ошибка при создании статьи');
+            abort(400, 'Error in create post');
         }
     }
 
-    public function show(int $id): JsonResponse
+    public function show(int $postId): JsonResponse
     {
         try {
-            $post = $this->postService->findByIdWithRelations($id);
+            $post = $this->postService->findByIdWithRelations($postId);
 
-            if (!$post) {
-                abort(404, 'Статья не найдена');
-            }
+            abort_if(!$post, 404);
 
             return response()->json([
-                'success' => true,
                 'data' => new PostResource($post)
             ]);
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(400, 'Ошибка при получении статьи');
+            abort(400, 'Error when receiving the post');
         }
     }
 
-    public function update(UpdatePostRequest $request, $id): JsonResponse
+    public function update(UpdatePostRequest $request, Post $post): JsonResponse
     {
         try {
-            if (!$this->postService->checkOwnership($id, $request->user()->id)) {
-                abort(403, 'У вас нет прав для редактирования этой статьи');
-            }
+            abort_if(!$this->postPolicy->update($request->user(), $post), 403);
 
-            $updatedPost = $this->postService->updatePost($id, $request->validated());
+            $updatedPost = $this->postService->updatePost($post, $request->validated());
 
-            if (!$updatedPost) {
-                abort(404, 'Статья не найдена');
-            }
+            abort_if(!$updatedPost, 404);
 
             return response()->json([
-                'success' => true,
-                'message' => 'Статья успешно обновлена!',
                 'data' => new PostResource($updatedPost->load(['user', 'category']))
             ]);
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(400, 'Ошибка при обновлении статьи');
+            abort(400, 'Error in update post');
         }
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(Post $post): JsonResponse
     {
         try {
-            $post = $this->postService->findById($id);
+            abort_if(!$this->postPolicy->delete(request()->user(), $post), 403);
 
-            if (!$post) {
-                abort(404, 'Статья не найдена');
-            }
+            $result = $this->postService->deletePost($post);
 
-            if (!$this->postService->checkOwnership($id, request()->user()->id)) {
-                abort(403, 'У вас нет прав для удаления этой статьи');
-            }
-
-            $result = $this->postService->deletePost($id);
-
-            if (!$result) {
-                abort(404, 'Статья не найдена');
-            }
+            abort_if(!$result, 404);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Статья успешно удалена!'
-            ], 200);
+            ]);
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(400, 'Ошибка при удалении статьи');
+            abort(400, 'Error in delete post');
         }
     }
 }

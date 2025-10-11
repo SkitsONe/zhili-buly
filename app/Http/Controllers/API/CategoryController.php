@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Http\Resources\CategoryResource;
+use App\Models\Category;
 use App\Services\CategoryService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -23,13 +24,12 @@ class CategoryController extends Controller
             $categories = $this->categoryService->getAllWithPostCount();
 
             return response()->json([
-                'success' => true,
                 'data' => CategoryResource::collection($categories)
             ]);
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(500, 'Ошибка при получении категорий.');
+            abort(500, 'Error when getting the category.');
         }
     }
 
@@ -39,75 +39,63 @@ class CategoryController extends Controller
             $category = $this->categoryService->createCategory($request->validated());
 
             return response()->json([
-                'success' => true,
-                'message' => 'Категория успешно создана!',
                 'data' => new CategoryResource($category)
             ], 201);
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(500, 'Ошибка при создании категории.');
+            abort(500, 'Error create category.');
         }
     }
 
-    public function show(int $id): JsonResponse
+    public function show(int $categoryId): JsonResponse
     {
         try {
-            $category = $this->categoryService->findByIdWithPosts($id);
+            $category = $this->categoryService->findByIdWithPosts($categoryId);
 
-            if (!$category) {
-                abort(404, 'Категория не найдена');
-            }
+            abort_if(!$category, 404);
 
             return response()->json([
-                'success' => true,
                 'data' => new CategoryResource($category)
             ]);
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(500, 'Ошибка при получении категории');
+            abort(500, 'Error when getting the category');
         }
     }
 
-    public function update(UpdateCategoryRequest $request, $id): JsonResponse
+    public function update(UpdateCategoryRequest $request, Category $category): JsonResponse
     {
         try {
-            $category = $this->categoryService->updateCategory($id, $request->validated());
+            $result = $this->categoryService->updateCategory($category, $request->validated());
 
-            if (!$category) {
-                abort(404, 'Категория не найдена');
-            }
+            abort_if(!$result, 404);
 
             return response()->json([
-                'success' => true,
-                'message' => 'Категория успешно обновлена!',
                 'data' => new CategoryResource($category)
             ]);
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(400, 'Ошибка при обновлении категории');
+            abort(400, 'Error in update category');
         }
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(Category $category): JsonResponse
     {
         try {
-            $result = $this->categoryService->deleteCategory($id);
+            $result = $this->categoryService->deleteCategory($category);
 
-            if (!$result) {
-                abort(404, 'Категория не найдена');
-            }
+            abort_if(!$result, 404);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Категория успешно удалена!'
-            ], 200);
+            ]);
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(500, 'Ошибка при удалении категории');
+            abort(500, 'Error in delete category');
         }
     }
 
@@ -123,7 +111,7 @@ class CategoryController extends Controller
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(500, 'Ошибка при получении категорий');
+            abort(500, 'Error when getting the category');
         }
     }
 }

@@ -14,20 +14,40 @@ class StorePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'short_description' => 'nullable|string|max:500',
-            'category_id' => 'nullable|integer',
-            'category_name' => 'nullable|string|max:255',
-            'published' => 'boolean',
+            'title' => [
+                'required',
+                'string',
+                'max:255'
+            ],
+            'content' => [
+                'required',
+                'string'
+            ],
+            'short_description' => [
+                'nullable',
+                'string',
+                'max:500'
+            ],
+            'category_id' => [
+                'nullable',
+                'integer'
+            ],
+            'category_name' => [
+                'nullable',
+                'string',
+                'max:255'
+            ],
+            'published' => [
+                'boolean'
+            ],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'title.required' => 'Заголовок обязателен',
-            'content.required' => 'Содержание обязательно',
+            'title.required' => 'Title required',
+            'content.required' => 'Content required',
         ];
     }
 

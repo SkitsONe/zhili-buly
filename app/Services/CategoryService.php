@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Repositories\CategoryRepository;
-use Exception;
 use Illuminate\Database\Eloquent\Collection;
 
 class CategoryService
@@ -18,14 +17,9 @@ class CategoryService
         return $this->categoryRepository->getAllWithPostCount();
     }
 
-    public function findByIdWithPosts(int $id): ?Category
+    public function findByIdWithPosts(int $categoryId): ?Category
     {
-        return $this->categoryRepository->findByIdWithPosts($id);
-    }
-
-    public function findById(int $id): ?Category
-    {
-        return $this->categoryRepository->findById($id);
+        return $this->categoryRepository->findByIdWithPosts($categoryId);
     }
 
     public function getAvailableCategories(): Collection
@@ -38,20 +32,15 @@ class CategoryService
         return $this->categoryRepository->createCategory($data);
     }
 
-    public function updateCategory(int $id, array $data): ?Category
+    public function updateCategory(Category $category, array $data): ?Category
     {
-        return $this->categoryRepository->updateCategory($id, $data);
+        return $this->categoryRepository->updateCategory($category, $data);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function deleteCategory(int $id): bool
+    public function deleteCategory(Category $category): bool
     {
-        if ($this->categoryRepository->categoryHasPosts($id)) {
-            throw new Exception('Невозможно удалить категорию с существующими статьями');
-        }
+        abort_if($this->categoryRepository->categoryHasPosts($category->id), 500);
 
-        return $this->categoryRepository->deleteCategory($id);
+        return $this->categoryRepository->deleteCategory($category);
     }
 }

@@ -39,13 +39,13 @@ class RegisterController extends Controller
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Ошибка валидации',
+                'message' => 'Error validate',
                 'errors' => $e->errors()
             ], 422);
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Ошибка при регистрации',
+                'message' => 'Error in registration',
                 'error' => $e->getMessage()
             ], 500);
         }

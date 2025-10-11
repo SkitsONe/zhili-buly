@@ -35,11 +35,11 @@ class AuthController extends Controller
 
         } catch (ValidationException $e) {
             Log::error($e->getMessage());
-            abort(401, 'Ошибка авторизации');
+            abort(401, );
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(500, 'Ошибка при входе в систему');
+            abort(500, 'Error when logging in');
         }
     }
 
@@ -63,7 +63,7 @@ class AuthController extends Controller
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(500, 'Ошибка при регистрации');
+            abort(500, 'Error in registration');
         }
     }
 
@@ -79,7 +79,7 @@ class AuthController extends Controller
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(500, 'Ошибка при выходе из системы');
+            abort(500, 'Error in logout');
         }
     }
 
@@ -95,7 +95,7 @@ class AuthController extends Controller
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            abort(500, 'Ошибка при получении данных пользователя');
+            abort(500, 'Error when receiving user data');
         }
     }
 }

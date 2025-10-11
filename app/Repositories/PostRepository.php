@@ -6,17 +6,18 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Str;
 
 class PostRepository
 {
+    private const PEERPAGE = 10;
+
     public function getAllWithFilters(array $filters = []): LengthAwarePaginator
     {
         $query = Post::with(['user', 'category']);
 
         if (isset($filters['category'])) {
-            $query->whereHas('category', function($q) use ($filters) {
-                $q->where('slug', $filters['category']);
+            $query->whereHas('category', function($query) use ($filters) {
+                $query->where('slug', $filters['category']);
             });
         }
 
@@ -24,25 +25,12 @@ class PostRepository
             $query->where('user_id', $filters['user']);
         }
 
-        return $query->latest()->paginate(10);
+        return $query->latest()->paginate($this::PEERPAGE);
     }
 
-    public function findByIdWithRelations(int $id): ?Post
+    public function findByIdWithRelations(int $postId): ?Post
     {
-        return Post::with(['user', 'category'])->find($id);
-    }
-
-    public function findById(int $id): ?Post
-    {
-        return Post::find($id);
-    }
-
-    public function getUserPosts(int $userId)
-    {
-        return Post::where('user_id', $userId)
-            ->with(['category', 'user'])
-            ->latest()
-            ->get();
+        return Post::with(['user', 'category'])->find($postId);
     }
 
     public function createPost(array $data, User $user, Category $category): Post
@@ -58,28 +46,15 @@ class PostRepository
         ]);
     }
 
-    public function updatePost($id, array $data): ?Post
+    public function updatePost(Post $post, array $data): ?Post
     {
-        $post = $this->findById($id)->update($data);
+        $post->update($data);
 
         return $post->fresh();
     }
 
-    public function deletePost(int $id): bool
+    public function deletePost(Post $post): bool
     {
-        $post = $this->findById($id);
-
-        if (!$post) {
-            return false;
-        }
-
         return $post->delete();
     }
-
-    public function checkOwnership(int $postId, int $userId): bool
-    {
-        $post = $this->findById($postId);
-        return $post && $post->user_id === $userId;
-    }
-
 }

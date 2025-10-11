@@ -36,11 +36,8 @@ class CategoryRepository
         ]);
     }
 
-    public function updateCategory(int $id, array $data): ?Category
+    public function updateCategory(Category $category, array $data): ?Category
     {
-        $category = $this->findById($id);
-
-
         $category->update([
             'name' => $data['name'],
             'slug' => Str::slug($data['name']),
@@ -49,14 +46,8 @@ class CategoryRepository
         return $category->fresh();
     }
 
-    public function deleteCategory(int $id): bool
+    public function deleteCategory(Category $category): bool
     {
-        $category = $this->findById($id);
-
-        if (!$category) {
-            return false;
-        }
-
         return $category->delete();
     }
 
@@ -80,7 +71,9 @@ class CategoryRepository
 
         if (!empty($data['category_name'])) {
             return Category::firstOrCreate(
-                ['name' => $data['category_name']],
+                [
+                    'name' => $data['category_name']
+                ],
                 [
                     'slug' => Str::slug($data['category_name'])
                 ]

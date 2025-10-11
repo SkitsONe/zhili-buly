@@ -14,12 +14,34 @@ class UpdatePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'sometimes|required|string|max:255',
-            'content' => 'sometimes|required|string',
-            'short_description' => 'nullable|string|max:500',
-            'category_id' => 'nullable|integer', // делаем необязательным
-            'category_name' => 'nullable|string|max:255', // добавляем поле для имени категории
-            'published' => 'boolean',
+            'title' => [
+                'sometimes',
+                'required',
+                'string',
+                'max:255'
+            ],
+            'content' => [
+                'sometimes',
+                'required',
+                'string'
+            ],
+            'short_description' => [
+                'nullable',
+                'string',
+                'max:500'
+            ],
+            'category_id' => [
+                'nullable',
+                'integer'
+            ],
+            'category_name' => [
+                'nullable',
+                'string',
+                'max:255'
+            ],
+            'published' => [
+                'boolean'
+            ],
         ];
     }
 

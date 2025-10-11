@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\User;
 use App\Repositories\PostRepository;
 use App\Repositories\CategoryRepository;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class PostService
 {
@@ -15,24 +16,14 @@ class PostService
         private CategoryRepository $categoryRepository
     ) {}
 
-    public function getAllWithFilters(array $filters = [])
+    public function getAllWithFilters(array $filters = []): LengthAwarePaginator
     {
         return $this->postRepository->getAllWithFilters($filters);
     }
 
-    public function findByIdWithRelations(int $id): ?Post
+    public function findByIdWithRelations(int $postId): ?Post
     {
-        return $this->postRepository->findByIdWithRelations($id);
-    }
-
-    public function findById(int $id): ?Post
-    {
-        return $this->postRepository->findById($id);
-    }
-
-    public function getUserPosts(int $userId)
-    {
-        return $this->postRepository->getUserPosts($userId);
+        return $this->postRepository->findByIdWithRelations($postId);
     }
 
     public function createPost(array $data, User $user): Post
@@ -40,22 +31,16 @@ class PostService
         $category = $this->resolveCategory($data);
 
         return $this->postRepository->createPost($data, $user, $category);
-
     }
 
-    public function updatePost(int $id, array $data): ?Post
+    public function updatePost(Post $post, array $data): ?Post
     {
-        return $this->postRepository->updatePost($id, $data);
+        return $this->postRepository->updatePost($post, $data);
     }
 
-    public function deletePost(int $id): bool
+    public function deletePost(Post $post): bool
     {
-        return $this->postRepository->deletePost($id);
-    }
-
-    public function checkOwnership(int $postId, int $userId): bool
-    {
-        return $this->postRepository->checkOwnership($postId, $userId);
+        return $this->postRepository->deletePost($post);
     }
 
     private function resolveCategory(array $data): Category

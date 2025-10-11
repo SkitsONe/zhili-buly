@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Repositories\UserRepository;
 use Illuminate\Validation\ValidationException;
-use Exception;
 
 class AuthService
 {
@@ -18,7 +17,7 @@ class AuthService
 
         if (!$user || !$this->userRepository->validateCredentials($user, $credentials['password'])) {
             throw ValidationException::withMessages([
-                'email' => ['Неверные учетные данные.'],
+                'email' => ['Invalid credentials.'],
             ]);
         }
 
