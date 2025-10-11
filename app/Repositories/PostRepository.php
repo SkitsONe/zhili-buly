@@ -2,9 +2,9 @@
 
 namespace App\Repositories;
 
+use App\Dto\PostDto;
 use App\Models\Category;
 use App\Models\Post;
-use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class PostRepository
@@ -33,22 +33,14 @@ class PostRepository
         return Post::with(['user', 'category'])->find($postId);
     }
 
-    public function createPost(array $data, User $user, Category $category): Post
+    public function createPost(PostDto $data): Post
     {
-        return Post::create([
-            'title' => $data['title'],
-            'content' => $data['content'],
-            'short_description' => $data['short_description'] ?? null,
-            'category_id' => $category->id,
-            'user_id' => $user->id,
-            'published' => $data['published'] ?? false,
-            'published_at' => ($data['published'] ?? false) ? now() : null,
-        ]);
+        return Post::create($data->toArray());
     }
 
-    public function updatePost(Post $post, array $data): ?Post
+    public function updatePost(Post $post, PostDto $data): ?Post
     {
-        $post->update($data);
+        $post->update($data->toArray());
 
         return $post->fresh();
     }
@@ -56,5 +48,10 @@ class PostRepository
     public function deletePost(Post $post): bool
     {
         return $post->delete();
+    }
+
+    public function categoryExists(int $categoryId): bool
+    {
+        return Category::where('id', $categoryId)->exists();
     }
 }

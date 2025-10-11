@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Dto\PostDto;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
@@ -46,11 +47,12 @@ class PostController extends Controller
     public function store(StorePostRequest $request): JsonResponse
     {
         try {
-            $post = $this->postService->createPost($request->validated(), $request->user());
-
-            return response()->json([
-                'data' => new PostResource($post->load(['user', 'category']))
-            ], 201);
+            $postData = PostDto::fromRequest($request->validated(), $request->user()->id);
+            $post = $this->postService->createPost($postData);
+            return response()->json(
+                new PostResource($post),
+                201
+            );
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
@@ -65,9 +67,9 @@ class PostController extends Controller
 
             abort_if(!$post, 404);
 
-            return response()->json([
-                'data' => new PostResource($post)
-            ]);
+            return response()->json(
+                new PostResource($post)
+            );
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
@@ -80,13 +82,13 @@ class PostController extends Controller
         try {
             abort_if(!$this->postPolicy->update($request->user(), $post), 403);
 
-            $updatedPost = $this->postService->updatePost($post, $request->validated());
+            $postData = PostDto::fromRequest($request->validated(), $post->user_id);
 
-            abort_if(!$updatedPost, 404);
+            $updatedPost = $this->postService->updatePost($post, $postData);
 
-            return response()->json([
-                'data' => new PostResource($updatedPost->load(['user', 'category']))
-            ]);
+            return response()->json(
+                new PostResource($updatedPost)
+            );
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
@@ -103,9 +105,7 @@ class PostController extends Controller
 
             abort_if(!$result, 404);
 
-            return response()->json([
-                'success' => true,
-            ]);
+            return response()->json(null, 204);
 
         } catch (Exception $e) {
             Log::error($e->getMessage());

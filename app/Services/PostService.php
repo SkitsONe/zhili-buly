@@ -2,18 +2,15 @@
 
 namespace App\Services;
 
+use App\Dto\PostDto;
 use App\Models\Post;
-use App\Models\Category;
-use App\Models\User;
 use App\Repositories\PostRepository;
-use App\Repositories\CategoryRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class PostService
 {
     public function __construct(
-        private PostRepository $postRepository,
-        private CategoryRepository $categoryRepository
+        private PostRepository $postRepository
     ) {}
 
     public function getAllWithFilters(array $filters = []): LengthAwarePaginator
@@ -26,25 +23,22 @@ class PostService
         return $this->postRepository->findByIdWithRelations($postId);
     }
 
-    public function createPost(array $data, User $user): Post
+    public function createPost(PostDto $data): Post
     {
-        $category = $this->resolveCategory($data);
+        abort_if($data->categoryId && !$this->postRepository->categoryExists($data->categoryId), 422);
 
-        return $this->postRepository->createPost($data, $user, $category);
+        return $this->postRepository->createPost($data);
     }
 
-    public function updatePost(Post $post, array $data): ?Post
+    public function updatePost(Post $post, PostDto $data): Post
     {
+        abort_if($data->categoryId && !$this->postRepository->categoryExists($data->categoryId), 422);
+
         return $this->postRepository->updatePost($post, $data);
     }
 
     public function deletePost(Post $post): bool
     {
         return $this->postRepository->deletePost($post);
-    }
-
-    private function resolveCategory(array $data): Category
-    {
-        return $this->categoryRepository->findOrCreateCategory($data);
     }
 }

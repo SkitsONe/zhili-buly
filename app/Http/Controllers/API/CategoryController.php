@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Dto\CategoryDto;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
@@ -23,9 +24,9 @@ class CategoryController extends Controller
         try {
             $categories = $this->categoryService->getAllWithPostCount();
 
-            return response()->json([
-                'data' => CategoryResource::collection($categories)
-            ]);
+            return response()->json(
+                CategoryResource::collection($categories)
+            );
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
@@ -36,11 +37,14 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request): JsonResponse
     {
         try {
-            $category = $this->categoryService->createCategory($request->validated());
+            $categoryData = CategoryDto::fromRequest($request->validated());
 
-            return response()->json([
-                'data' => new CategoryResource($category)
-            ], 201);
+            $category = $this->categoryService->createCategory($categoryData);
+
+            return response()->json(
+                new CategoryResource($category),
+                201
+            );
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
@@ -55,9 +59,9 @@ class CategoryController extends Controller
 
             abort_if(!$category, 404);
 
-            return response()->json([
-                'data' => new CategoryResource($category)
-            ]);
+            return response()->json(
+                new CategoryResource($category)
+            );
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
@@ -68,13 +72,12 @@ class CategoryController extends Controller
     public function update(UpdateCategoryRequest $request, Category $category): JsonResponse
     {
         try {
-            $result = $this->categoryService->updateCategory($category, $request->validated());
+            $categoryData = CategoryDto::fromRequest($request->validated());
+            $updatedCategory = $this->categoryService->updateCategory($category, $categoryData);
 
-            abort_if(!$result, 404);
-
-            return response()->json([
-                'data' => new CategoryResource($category)
-            ]);
+            return response()->json(
+                new CategoryResource($updatedCategory)
+            );
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
@@ -89,29 +92,11 @@ class CategoryController extends Controller
 
             abort_if(!$result, 404);
 
-            return response()->json([
-                'success' => true,
-            ]);
+            return response()->json(null, 204);
 
         } catch (Exception $e) {
             Log::error($e->getMessage());
             abort(500, 'Error in delete category');
-        }
-    }
-
-    public function available(): JsonResponse
-    {
-        try {
-            $categories = $this->categoryService->getAvailableCategories();
-
-            return response()->json([
-                'success' => true,
-                'data' => CategoryResource::collection($categories)
-            ]);
-
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            abort(500, 'Error when getting the category');
         }
     }
 }

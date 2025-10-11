@@ -74,7 +74,6 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Успешный выход из системы'
             ]);
 
         } catch (Exception $e) {

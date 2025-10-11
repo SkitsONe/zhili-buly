@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Dto\CategoryDto;
 use App\Models\Category;
 use App\Repositories\CategoryRepository;
 use Illuminate\Database\Eloquent\Collection;
@@ -22,17 +23,12 @@ class CategoryService
         return $this->categoryRepository->findByIdWithPosts($categoryId);
     }
 
-    public function getAvailableCategories(): Collection
+    public function createCategory(CategoryDto $data): Category
     {
-        return $this->categoryRepository->getAvailableCategories();
+        return $this->categoryRepository->create($data);
     }
 
-    public function createCategory(array $data): Category
-    {
-        return $this->categoryRepository->createCategory($data);
-    }
-
-    public function updateCategory(Category $category, array $data): ?Category
+    public function updateCategory(Category $category, CategoryDto $data): Category
     {
         return $this->categoryRepository->updateCategory($category, $data);
     }

@@ -51,7 +51,7 @@ class StorePostRequest extends FormRequest
         ];
     }
 
-    public function prepareForValidation()
+    public function prepareForValidation(): void
     {
         if ($this->has('category_name') && !$this->has('category_id')) {
             $this->merge([
