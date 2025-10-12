@@ -26,6 +26,7 @@ class CategoryRepository
     public function updateCategory(Category $category, CategoryDto $data): Category
     {
         $category->update($data->toArray());
+
         return $category->fresh();
     }
 

@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\User;
+use App\Dto\RegisterDto;
 use Illuminate\Support\Facades\Hash;
 
 class UserRepository
@@ -12,13 +13,9 @@ class UserRepository
         return User::where('email', $email)->first();
     }
 
-    public function createUser(array $data): User
+    public function registerUser(RegisterDto $registerDto): User
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        return User::create($registerDto->toArray());
     }
 
     public function validateCredentials(User $user, string $password): bool

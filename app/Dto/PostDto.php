@@ -35,7 +35,8 @@ class PostDto
             'short_description' => $this->shortDescription,
             'category_id' => $this->categoryId,
             'published' => $this->published,
-            'published_at' => $this->publishedAt,
+            'published_at' => $this->published ? now()->toDateTimeString() : null,
+            'created_at' => now()->toDateTimeString(),
             'user_id' => $this->userId,
         ];
     }
